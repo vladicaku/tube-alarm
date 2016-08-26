@@ -1,0 +1,94 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="20dp"
+        android:weightSum="1">
+
+        <TextView
+            android:id="@+id/dialog_clock_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/set_time"
+            android:textAlignment="center"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <TimePicker
+            android:id="@+id/dialog_clock_timePicker"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="10dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:layout_marginTop="10dp">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <ToggleButton
+                    android:id="@+id/dialog_clock_day_monday"
+                    android:layout_width="50dp"
+                    android:layout_height="wrap_content"
+                    android:text="New ToggleButton"
+                    android:textOff="@string/day_monday"
+                    android:textOn="@string/day_monday" />
+
+                <ToggleButton
+                    android:id="@+id/dialog_clock_day_tuesday"
+                    android:layout_width="50dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:text="New ToggleButton"
+                    android:textOff="@string/day_tuesday"
+                    android:textOn="@string/day_tuesday" />
+
+                <ToggleButton
+                    android:id="@+id/dialog_clock_day_wednesday"
+                    android:layout_width="50dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:text="New ToggleButton"
+                    android:textOff="@string/day_wednesday"
+                    android:textOn="@string/day_wednesday" />
+
+                <ToggleButton
+                    android:id="@+id/dialog_clock_day_friday"
+                    android:layout_width="50dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:text="New ToggleButton"
+                    android:textOff="@string/day_friday"
+                    android:textOn="@string/day_friday" />
+
+                <ToggleButton
+                    android:id="@+id/dialog_clock_day_saturday"
+                    android:layout_width="50dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:text="New ToggleButton"
+                    android:textOff="@string/day_saturday"
+                    android:textOn="@string/day_saturday" />
+
+                <ToggleButton
+                    android:id="@+id/dialog_clock_day_sunday"
+                    android:layout_width="50dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:text="New ToggleButton"
+                    android:textOff="@string/day_sunday"
+                    android:textOn="@string/day_sunday" />
+            </LinearLayout>
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>
+
