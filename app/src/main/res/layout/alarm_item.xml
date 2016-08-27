@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="65dp"
+    android:minHeight="65dp"
+    android:orientation="horizontal"
+    android:paddingLeft="5dp"
+    android:paddingRight="5dp"
+    android:weightSum="10">
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="4"
+        android:gravity="left">
+
+        <TextView
+            android:id="@+id/alarm_item_time"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="00:33"
+            android:textSize="36sp"
+            android:gravity="left|fill_vertical" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="4"
+        android:weightSum="7"
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/alarm_item_day_monday"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="@string/day_monday"
+            android:gravity="center"/>
+
+        <TextView
+            android:id="@+id/alarm_item_day_tuesday"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="@string/day_tuesday"
+            android:gravity="center"/>
+
+        <TextView
+            android:id="@+id/alarm_item_day_wednesday"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="@string/day_wednesday"
+            android:gravity="center"/>
+
+        <TextView
+            android:id="@+id/alarm_item_day_thursday"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="@string/day_thursday"
+            android:gravity="center"/>
+
+        <TextView
+            android:id="@+id/alarm_item_day_friday"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="@string/day_friday"
+            android:gravity="center"/>
+
+        <TextView
+            android:id="@+id/alarm_item_day_saturday"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="@string/day_saturday"
+            android:gravity="center"/>
+
+        <TextView
+            android:id="@+id/alarm_item_day_sunday"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="@string/day_sunday"
+            android:gravity="center"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="2"
+        android:gravity="right">
+
+        <ImageView
+            android:id="@+id/alarm_item_indicator"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_gravity="center"
+            android:layout_marginRight="7dp"
+            android:src="@android:drawable/presence_online" />
+
+        <!--<ImageView-->
+            <!--android:id="@+id/alarm_item_indicator"-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:layout_weight="3"-->
+            <!--android:layout_centerInParent="true"-->
+            <!--android:adjustViewBounds="true"-->
+            <!--android:src="@android:drawable/presence_online" />-->
+
+    </LinearLayout>
+
+</LinearLayout>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tubealarm="http://schemas.android.com/apk/res-auto">
+
+    <!--tubealarm:showAsAction="always"-->
+    <item
+        android:id="@+id/options_menu_add_alarm"
+        android:icon="@android:drawable/ic_input_add"
+        android:showAsAction="always"
+        android:title="@string/add_alarm" />
+
+    <group>
+        <item
+            android:id="@+id/options_menu_settings"
+            android:icon="@android:drawable/ic_menu_preferences"
+            android:title="@string/settings" />
+    </group>
+
+    <group>
+        <item
+            android:id="@+id/options_menu_exit"
+            android:title="@string/exit" />
+    </group>
+</menu>

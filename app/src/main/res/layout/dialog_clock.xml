@@ -84,7 +84,8 @@
                     android:layout_gravity="center_horizontal"
                     android:text="New ToggleButton"
                     android:textOff="@string/day_sunday"
-                    android:textOn="@string/day_sunday" />
+                    android:textOn="@string/day_sunday"
+                    android:textColor="@android:color/holo_red_light" />
             </LinearLayout>
         </LinearLayout>
 
