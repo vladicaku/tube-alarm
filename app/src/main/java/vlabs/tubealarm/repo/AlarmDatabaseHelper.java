@@ -45,6 +45,8 @@ public class AlarmDatabaseHelper extends SQLiteOpenHelper {
     private static final String KEY_SUNDAY = "sunday";
     private static final String KEY_REPEAT_WEEKLY = "repeatWeekly";
     private static final String KEY_YOUTUBE_URL = "youtubeUrl";
+    private static final String KEY_VIBRATE = "vibrate";
+    private static final String KEY_MESSAGE = "message";
     private static final String KEY_ENABLED = "enabled";
 
     public AlarmDatabaseHelper(Context context) {
@@ -63,6 +65,8 @@ public class AlarmDatabaseHelper extends SQLiteOpenHelper {
                 + KEY_SUNDAY + " NUMERIC,"
                 + KEY_REPEAT_WEEKLY + " NUMERIC,"
                 + KEY_YOUTUBE_URL + " TEXT,"
+                + KEY_MESSAGE + " TEXT,"
+                + KEY_VIBRATE + " NUMERIC,"
                 + KEY_ENABLED + " NUMERIC" + ")";
         db.execSQL(CREATE_CONTACTS_TABLE);
     }
@@ -76,7 +80,7 @@ public class AlarmDatabaseHelper extends SQLiteOpenHelper {
     }
 
     // Save entity
-    public long save(Alarm alarm) {
+    public int save(Alarm alarm) {
         SQLiteDatabase database = getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(KEY_HOURS, alarm.getHours());
@@ -92,9 +96,11 @@ public class AlarmDatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_SUNDAY, alarm.getSunday());
         values.put(KEY_REPEAT_WEEKLY, alarm.getRepeatWeekly());
         values.put(KEY_YOUTUBE_URL, alarm.getYoutubeUrl());
+        values.put(KEY_MESSAGE, alarm.getMessage());
+        values.put(KEY_VIBRATE, alarm.getVibrate());
         values.put(KEY_ENABLED, alarm.getEnabled());
 
-        long id = database.insert(TABLE_ALARM, null, values);
+        int id = (int)(database.insert(TABLE_ALARM, null, values));
         alarm.setId(id);
 
         //database.close();
@@ -102,7 +108,7 @@ public class AlarmDatabaseHelper extends SQLiteOpenHelper {
     }
 
     // Get single
-    public Alarm get(int id) {
+    public Alarm get(Integer id) {
         SQLiteDatabase database = getWritableDatabase();
         Cursor cursor = database.query(TABLE_ALARM, new String[]{
                 KEY_ID,
@@ -119,6 +125,8 @@ public class AlarmDatabaseHelper extends SQLiteOpenHelper {
                 KEY_SUNDAY,
                 KEY_REPEAT_WEEKLY,
                 KEY_YOUTUBE_URL,
+                KEY_MESSAGE,
+                KEY_VIBRATE,
                 KEY_ENABLED
         }, KEY_ID + " = ?", new String[]{String.valueOf(id)}, null, null, null);
 
@@ -127,7 +135,7 @@ public class AlarmDatabaseHelper extends SQLiteOpenHelper {
         }
 
         Alarm alarm = new Alarm();
-        alarm.setId(cursor.getLong(0));
+        alarm.setId(cursor.getInt(0));
         alarm.setHours(cursor.getInt(1));
         alarm.setMinutes(cursor.getInt(2));
         alarm.setFormat24(cursor.getInt(3) != 0);
@@ -141,7 +149,9 @@ public class AlarmDatabaseHelper extends SQLiteOpenHelper {
         alarm.setSunday(cursor.getInt(11) != 0);
         alarm.setRepeatWeekly(cursor.getInt(12) != 0);
         alarm.setYoutubeUrl(cursor.getString(13));
-        alarm.setEnabled(cursor.getInt(14) != 0);
+        alarm.setMessage(cursor.getString(14));
+        alarm.setVibrate(cursor.getInt(15) != 0);
+        alarm.setEnabled(cursor.getInt(16) != 0);
 
         cursor.close();
         //database.close();
@@ -158,7 +168,7 @@ public class AlarmDatabaseHelper extends SQLiteOpenHelper {
         if (cursor.moveToFirst()) {
             do {
                 Alarm alarm = new Alarm();
-                alarm.setId(cursor.getLong(0));
+                alarm.setId(cursor.getInt(0));
                 alarm.setHours(cursor.getInt(1));
                 alarm.setMinutes(cursor.getInt(2));
                 alarm.setFormat24(cursor.getInt(3) != 0);
@@ -172,7 +182,9 @@ public class AlarmDatabaseHelper extends SQLiteOpenHelper {
                 alarm.setSunday(cursor.getInt(11) != 0);
                 alarm.setRepeatWeekly(cursor.getInt(12) != 0);
                 alarm.setYoutubeUrl(cursor.getString(13));
-                alarm.setEnabled(cursor.getInt(14) != 0);
+                alarm.setMessage(cursor.getString(14));
+                alarm.setVibrate(cursor.getInt(15) != 0);
+                alarm.setEnabled(cursor.getInt(16) != 0);
                 list.add(alarm);
             } while (cursor.moveToNext());
         }
@@ -217,7 +229,10 @@ public class AlarmDatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_SUNDAY, alarm.getSunday());
         values.put(KEY_REPEAT_WEEKLY, alarm.getRepeatWeekly());
         values.put(KEY_YOUTUBE_URL, alarm.getYoutubeUrl());
+        values.put(KEY_MESSAGE, alarm.getMessage());
+        values.put(KEY_VIBRATE, alarm.getVibrate());
         values.put(KEY_ENABLED, alarm.getEnabled());
+
 
         return database.update(TABLE_ALARM, values, KEY_ID + " = ?", new String[] { String.valueOf(alarm.getId()) });
     }
@@ -228,7 +243,7 @@ public class AlarmDatabaseHelper extends SQLiteOpenHelper {
     }
 
     // Delete by id
-    public void delete(Long id) {
+    public void delete(Integer id) {
         SQLiteDatabase database = this.getWritableDatabase();
         database.delete(TABLE_ALARM, KEY_ID + " = ?", new String[] {String.valueOf(id)});
         //database.close();

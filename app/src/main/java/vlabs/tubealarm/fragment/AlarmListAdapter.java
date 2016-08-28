@@ -90,7 +90,7 @@ public class AlarmListAdapter extends ArrayAdapter<Alarm> {
             if (alarm.getSaturday() == true) {
                 saturday.setTextColor(getContext().getResources().getColor(R.color.alarm_item_active_day));
             } else {
-                sunday.setTextColor(getContext().getResources().getColor(android.R.color.primary_text_dark));
+                saturday.setTextColor(getContext().getResources().getColor(android.R.color.primary_text_dark));
             }
 
             if (alarm.getSunday() == true) {
@@ -110,8 +110,6 @@ public class AlarmListAdapter extends ArrayAdapter<Alarm> {
             indicator.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    alarm.setEnabled(!alarm.getEnabled());
-                    Toast.makeText(getContext(), "Indicator", Toast.LENGTH_SHORT).show();
                     alarmListAdapterListener.onIndicatorClick(alarm);
                 }
             });

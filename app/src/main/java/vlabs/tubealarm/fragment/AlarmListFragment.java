@@ -1,6 +1,7 @@
 package vlabs.tubealarm.fragment;
 
 import android.app.ListFragment;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,16 +16,27 @@ import java.util.List;
 import vlabs.tubealarm.R;
 import vlabs.tubealarm.model.Alarm;
 import vlabs.tubealarm.repo.AlarmDatabaseHelper;
+import vlabs.tubealarm.service.TubeAlarmService;
 
 public class AlarmListFragment extends ListFragment implements AdapterView.OnItemClickListener, AlarmListAdapter.AlarmListAdapterListener {
 
     AlarmDatabaseHelper alarmDatabaseHelper = null;
     List<Alarm> list = null;
     AlarmListAdapter alarmListAdapter;
+    AlarmListFragmentListener alarmListFragmentListener;
+
+    public static interface AlarmListFragmentListener {
+        void onAlarmClick(Alarm alarm);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.alarm_list_fragment, container, false);
+        try {
+            alarmListFragmentListener = (AlarmListFragmentListener) getActivity();
+        } catch (Exception ex) {
+            throw new ClassCastException(getActivity().toString() + " must implement AlarmListFragmentListener");
+        }
         return view;
     }
 
@@ -48,13 +60,28 @@ public class AlarmListFragment extends ListFragment implements AdapterView.OnIte
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Toast.makeText(getActivity(), "Item: " + position, Toast.LENGTH_SHORT).show();
+        Alarm alarm = alarmListAdapter.getItem(position);
+        alarmListFragmentListener.onAlarmClick(alarm);
+    }
+
+    public void reload() {
+        List<Alarm> newList = alarmDatabaseHelper.getAll();
+        list.clear();
+        list.addAll(newList);
+        alarmListAdapter.notifyDataSetChanged();
+        Toast.makeText(getActivity(),"Reload called", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onIndicatorClick(Alarm alarm) {
+        alarm.setEnabled(!alarm.getEnabled());
         alarmDatabaseHelper.update(alarm);
         alarmListAdapter.notifyDataSetChanged();
+        if (alarm.getEnabled()) {
+            TubeAlarmService.updateAlarm(getActivity(), alarm.getId());
+        } else {
+            TubeAlarmService.deleteAlarm(getActivity(), alarm.getId());
+        }
     }
 
 }

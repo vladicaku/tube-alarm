@@ -6,7 +6,7 @@ import com.google.api.client.util.DateTime;
  * Created by User on 8/26/2016.
  */
 public class Alarm {
-    private Long id;
+    private Integer id = -1;
     private Integer hours;
     private Integer minutes;
     private Boolean format24; // this is true if the time is in 24 hours format
@@ -20,13 +20,15 @@ public class Alarm {
     private Boolean sunday;
     private Boolean repeatWeekly;
     private String youtubeUrl;
+    private Boolean vibrate;
+    private String message;
     private Boolean enabled;
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -138,7 +140,27 @@ public class Alarm {
         return enabled;
     }
 
+    public Boolean getVibrate() {
+        return vibrate;
+    }
+
+    public void setVibrate(Boolean vibrate) {
+        this.vibrate = vibrate;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
     public void setEnabled(Boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public boolean isNew() {
+        return id == -1;
     }
 }
