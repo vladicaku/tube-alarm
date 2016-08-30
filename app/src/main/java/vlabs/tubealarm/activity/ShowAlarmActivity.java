@@ -56,16 +56,14 @@ public class ShowAlarmActivity extends Activity {
         boolean later = intent.getBooleanExtra("later", false);
 
         if (id == -1) {
-            finish();
-            System.exit(0);
+            closeApp();
             return;
         }
 
         alarm = alarmDatabaseHelper.get(id);
 
         if (!alarm.getEnabled()) {
-            finish();
-            System.exit(0);
+            closeApp();
             return;
         }
 
@@ -81,8 +79,7 @@ public class ShowAlarmActivity extends Activity {
         ok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                finish();
-                System.exit(0);
+                closeApp();
                 return;
             }
         });
@@ -91,8 +88,7 @@ public class ShowAlarmActivity extends Activity {
             @Override
             public void onClick(View v) {
                 TubeAlarmService.laterAlarm(activity, alarm.getId());
-                finish();
-                System.exit(0);
+                closeApp();
                 return;
             }
         });
@@ -114,6 +110,13 @@ public class ShowAlarmActivity extends Activity {
     protected void onPause() {
         super.onPause();
         mediaPlayer.stop();
+    }
+
+    private void closeApp() {
+        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.putExtra("EXIT", true);
+        startActivity(intent);
     }
 
     private boolean checkConnection() {

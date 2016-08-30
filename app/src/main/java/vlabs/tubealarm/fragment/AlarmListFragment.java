@@ -110,7 +110,7 @@ public class AlarmListFragment extends ListFragment implements AdapterView.OnIte
         alarmDatabaseHelper.update(alarm);
         alarmListAdapter.notifyDataSetChanged();
         if (alarm.getEnabled()) {
-            TubeAlarmService.updateAlarm(getActivity(), alarm.getId());
+            TubeAlarmService.setAlarm(getActivity(), alarm.getId());
         } else {
             TubeAlarmService.deleteAlarm(getActivity(), alarm.getId());
         }

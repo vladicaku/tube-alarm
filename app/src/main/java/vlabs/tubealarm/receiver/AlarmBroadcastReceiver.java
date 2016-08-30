@@ -12,7 +12,11 @@ public class AlarmBroadcastReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        TubeAlarmService.rescheduleAlarm(context, intent);
-        TubeAlarmService.showAlarm(context, intent);
+        boolean later = intent.getBooleanExtra("later", false);
+        int id = intent.getIntExtra("id", -1);
+        if (!later) {
+            TubeAlarmService.rescheduleAlarm(context, id);
+        }
+        TubeAlarmService.showAlarm(context, id);
     }
 }

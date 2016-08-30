@@ -32,6 +32,11 @@ public class MainActivity extends Activity implements AlarmListFragment.AlarmLis
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
 
+        /* Exit App */
+        if (getIntent().getBooleanExtra("EXIT", false)) {
+            finish();
+        }
+
 //        myouTubePlayerView = (YouTubePlayerView) findViewById(R.id.youtube_player_view);
 //        monInitializedListener = new YouTubePlayer.OnInitializedListener() {
 //            @Override

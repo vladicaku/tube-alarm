@@ -21,16 +21,16 @@ import vlabs.tubealarm.repo.AlarmDatabaseHelper;
  * An {@link IntentService} subclass for handling asynchronous task requests in
  * a service on a separate handler thread.
  * <p/>
+ *
+ *  adb shell dumpsys alarm > t.txt
  */
 public class TubeAlarmService extends IntentService {
     private static final String ACTION_SET_ALARM = "vlabs.tubealarm.service.action.SET_ALARM";
     private static final String ACTION_DELETE_ALARM = "vlabs.tubealarm.service.action.DELETE_ALARM";
-    private static final String ACTION_UPDATE_ALARM = "vlabs.tubealarm.service.action.UPDATE_ALARM";
     private static final String ACTION_SET_ALL_ALARMS_ON_BOOT = "vlabs.tubealarm.service.action.SET_ALL_ALARMS_ON_BOOT";
-    private static final String ACTION_LATER_ALARM = "vlabs.tubealarm.service.action.SET_ALL_ALARMS_ON_BOOT";
+    private static final String ACTION_LATER_ALARM = "vlabs.tubealarm.service.action.SET_LATER_ALARM";
+    private static final String ACTION_RESCHEDULE_ALARM = "vlabs.tubealarm.service.action.RESCHEDULE_ALARM";
 
-    private static final String EXTRA_NEW_ALARM = "vlabs.tubealarm.service.extra.NEW_ALARM";
-    private static final String EXTRA_OLD_ALARM = "vlabs.tubealarm.service.extra.OLD_ALARM";
     private static final String EXTRA_ALARM_ID = "vlabs.tubealarm.service.extra.ALARM_ID";
 
     private static Context serviceContext;
@@ -40,7 +40,6 @@ public class TubeAlarmService extends IntentService {
     public TubeAlarmService() {
         super("TubeAlarmService");
         serviceContext = this;
-        //initService();
     }
 
     @Override
@@ -58,7 +57,8 @@ public class TubeAlarmService extends IntentService {
         }
     }
 
-    /* If the service is already performing a task this action will be queued. */
+    /* If the service is already performing a task this action will be queued.
+    * Create Set Alarm Intent */
     public static void setAlarm(Context context, Integer id) {
         Intent intent = new Intent(context, TubeAlarmService.class);
         intent.setAction(ACTION_SET_ALARM);
@@ -66,6 +66,8 @@ public class TubeAlarmService extends IntentService {
         context.startService(intent);
     }
 
+    /* If the service is already performing a task this action will be queued.
+    * Create Delete Alarm Intent */
     public static void deleteAlarm(Context context, Integer id) {
         Intent intent = new Intent(context, TubeAlarmService.class);
         intent.setAction(ACTION_DELETE_ALARM);
@@ -73,40 +75,34 @@ public class TubeAlarmService extends IntentService {
         context.startService(intent);
     }
 
-    public static void updateAlarm(Context context, Integer id) {
-        Intent intent = new Intent(context, TubeAlarmService.class);
-        intent.setAction(ACTION_UPDATE_ALARM);
-        intent.putExtra(EXTRA_ALARM_ID, id);
-        context.startService(intent);
-    }
-
+    /* If the service is already performing a task this action will be queued.
+    * Create Set All Alarms On Boot Intent */
     public static void setAllAlarmsOnBoot(Context context) {
         Intent intent = new Intent(context, TubeAlarmService.class);
         intent.setAction(ACTION_SET_ALL_ALARMS_ON_BOOT);
         context.startService(intent);
     }
 
-    public static void rescheduleAlarm(Context context, Intent receivedIntent) {
-        int id = receivedIntent.getIntExtra("id", -1);
-        boolean later = receivedIntent.getBooleanExtra("later", false);
-
-        if (!later || (id == -1)) {
-            return;
-        }
-
-        Alarm alarm = alarmDatabaseHelper.get(id);
-        if (alarm.getRepeatWeekly()) {
-            setAlarm(context, id);
-        }
+    /* If the service is already performing a task this action will be queued.
+    * Create Reschedule Intent */
+    public static void rescheduleAlarm(Context context, Integer id) {
+        Intent intent = new Intent(context, TubeAlarmService.class);
+        intent.setAction(ACTION_RESCHEDULE_ALARM);
+        intent.putExtra(EXTRA_ALARM_ID, id);
+        context.startService(intent);
     }
 
-    public static void showAlarm(Context context, Intent receivedIntent) {
+    /* If the service is already performing a task this action will be queued.
+    * Create Show Alarm Intent */
+    public static void showAlarm(Context context, Integer id) {
         Intent intent = new Intent(context, ShowAlarmActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.putExtra("id", receivedIntent.getIntExtra("id", -1));
+        intent.putExtra("id", id);
         context.startActivity(intent);
     }
 
+    /* If the service is already performing a task this action will be queued.
+    * Create Show Alarm Later Intent */
     public static void laterAlarm(Context context, Integer id) {
         Intent intent = new Intent(context, TubeAlarmService.class);
         intent.setAction(ACTION_LATER_ALARM);
@@ -124,7 +120,7 @@ public class TubeAlarmService extends IntentService {
             if (ACTION_SET_ALARM.equals(action)) {
                 Integer id = intent.getIntExtra(EXTRA_ALARM_ID, -1);
                 handleSetAlarm(id);
-            } else if (ACTION_UPDATE_ALARM.equals(action)) {
+            } else if (ACTION_RESCHEDULE_ALARM.equals(action)) {
                 Integer id = intent.getIntExtra(EXTRA_ALARM_ID, -1);
                 handleSetAlarm(id);
             } else if (ACTION_DELETE_ALARM.equals(action)) {
@@ -174,14 +170,6 @@ public class TubeAlarmService extends IntentService {
         intent.putExtra("id", alarm.getId());
         PendingIntent pendingIntent = PendingIntent.getBroadcast(serviceContext, alarm.getId() * 10 + day, intent, PendingIntent.FLAG_ONE_SHOT);
 
-        // TODO
-        // !!! IMPORTANT !!!
-        // Repeat alarm in receiver
-//        if (alarm.getRepeatWeekly()) {
-//            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY * 7, pendingIntent);
-//        } else {
-
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -227,19 +215,11 @@ public class TubeAlarmService extends IntentService {
         setAlarmForAllDays(alarm);
     }
 
-//    /* Update Alarm */
-//    private void handleUpdateAlarm(Integer id) {
-//        Alarm alarm = alarmDatabaseHelper.get(id);
-//        deleteAlarmForAllDays(alarm);
-//        setAlarmForAllDays(alarm);
-//    }
-
     /* Delete Alarm */
     private void handleDeleteAlarm(Integer id) {
         Alarm alarm = alarmDatabaseHelper.get(id);
         deleteAlarmForAllDays(alarm);
         alarmDatabaseHelper.delete(alarm);
-        Toast.makeText(serviceContext, "Deleted from service", Toast.LENGTH_SHORT).show();
     }
 
     /* Boot */
@@ -250,6 +230,8 @@ public class TubeAlarmService extends IntentService {
         }
     }
 
+    /* TODO */
+    /* To be refactored */
     /* Handle Later Alarm */
     private void handleLaterAlarm(Integer id) {
         if (id == -1) {
