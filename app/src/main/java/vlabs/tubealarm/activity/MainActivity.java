@@ -32,10 +32,6 @@ public class MainActivity extends Activity implements AlarmListFragment.AlarmLis
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
 
-        alarmDatabaseHelper = new AlarmDatabaseHelper(this);
-        List<Alarm> alarms = alarmDatabaseHelper.getAll();
-        System.out.println("DA");
-
 //        myouTubePlayerView = (YouTubePlayerView) findViewById(R.id.youtube_player_view);
 //        monInitializedListener = new YouTubePlayer.OnInitializedListener() {
 //            @Override

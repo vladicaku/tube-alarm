@@ -27,8 +27,8 @@ public class AlarmFragment extends Fragment {
 
     public static interface AlarmFragmentListener {
         void onSaveClick();
-        void onCancelClick();
 
+        void onCancelClick();
     }
 
     AlarmFragmentListener alarmFragmentListener;
@@ -74,6 +74,8 @@ public class AlarmFragment extends Fragment {
         final EditText youtubeUrl = (EditText) getView().findViewById(R.id.alarm_fragment_youtube_url);
         final EditText message = (EditText) getView().findViewById(R.id.alarm_fragment_message);
 
+        enabled.setChecked(true);
+
         if (alarmId != -1) {
             alarm = alarmDatabaseHelper.get(alarmId);
             enabled.setChecked(alarm.getEnabled());
@@ -98,6 +100,10 @@ public class AlarmFragment extends Fragment {
             @TargetApi(Build.VERSION_CODES.M)
             @Override
             public void onClick(View v) {
+                if (youtubeUrl.getText().toString().trim().equals("")) {
+                    Toast.makeText(getActivity(), "You must enter YouTube url", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 alarm.setEnabled(enabled.isChecked());
                 alarm.setFormat24(true);
                 alarm.setHours(timePicker.getCurrentHour());
@@ -121,16 +127,6 @@ public class AlarmFragment extends Fragment {
                     alarmDatabaseHelper.update(alarm);
                     TubeAlarmService.updateAlarm(getActivity(), alarmId);
                 }
-//                if (alarmId == -1) {
-//                    alarmId =
-//                    alarm.setId(alarmId);
-//                    TubeAlarmService.setAlarm(getActivity(), alarmId);
-//                } else {
-//                    alarm.setId(alarmId);
-//                    alarmDatabaseHelper.update(alarm);
-//                    TubeAlarmService.updateAlarm(getActivity(), alarmId);
-//                }
-
                 Toast.makeText(getActivity(), "Save called", Toast.LENGTH_SHORT).show();
                 alarmFragmentListener.onSaveClick();
             }

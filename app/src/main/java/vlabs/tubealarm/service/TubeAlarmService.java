@@ -6,10 +6,13 @@ import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.Context;
 import android.os.Build;
+import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import vlabs.tubealarm.activity.ShowAlarmActivity;
 import vlabs.tubealarm.model.Alarm;
 import vlabs.tubealarm.receiver.AlarmBroadcastReceiver;
 import vlabs.tubealarm.repo.AlarmDatabaseHelper;
@@ -17,13 +20,14 @@ import vlabs.tubealarm.repo.AlarmDatabaseHelper;
 /**
  * An {@link IntentService} subclass for handling asynchronous task requests in
  * a service on a separate handler thread.
- * <p>
+ * <p/>
  */
 public class TubeAlarmService extends IntentService {
     private static final String ACTION_SET_ALARM = "vlabs.tubealarm.service.action.SET_ALARM";
     private static final String ACTION_DELETE_ALARM = "vlabs.tubealarm.service.action.DELETE_ALARM";
     private static final String ACTION_UPDATE_ALARM = "vlabs.tubealarm.service.action.UPDATE_ALARM";
     private static final String ACTION_SET_ALL_ALARMS_ON_BOOT = "vlabs.tubealarm.service.action.SET_ALL_ALARMS_ON_BOOT";
+    private static final String ACTION_LATER_ALARM = "vlabs.tubealarm.service.action.SET_ALL_ALARMS_ON_BOOT";
 
     private static final String EXTRA_NEW_ALARM = "vlabs.tubealarm.service.extra.NEW_ALARM";
     private static final String EXTRA_OLD_ALARM = "vlabs.tubealarm.service.extra.OLD_ALARM";
@@ -82,24 +86,55 @@ public class TubeAlarmService extends IntentService {
         context.startService(intent);
     }
 
+    public static void rescheduleAlarm(Context context, Intent receivedIntent) {
+        int id = receivedIntent.getIntExtra("id", -1);
+        boolean later = receivedIntent.getBooleanExtra("later", false);
+
+        if (!later || (id == -1)) {
+            return;
+        }
+
+        Alarm alarm = alarmDatabaseHelper.get(id);
+        if (alarm.getRepeatWeekly()) {
+            setAlarm(context, id);
+        }
+    }
+
+    public static void showAlarm(Context context, Intent receivedIntent) {
+        Intent intent = new Intent(context, ShowAlarmActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.putExtra("id", receivedIntent.getIntExtra("id", -1));
+        context.startActivity(intent);
+    }
+
+    public static void laterAlarm(Context context, Integer id) {
+        Intent intent = new Intent(context, TubeAlarmService.class);
+        intent.setAction(ACTION_LATER_ALARM);
+        intent.putExtra(EXTRA_ALARM_ID, id);
+        context.startService(intent);
+    }
+
     @Override
     protected void onHandleIntent(Intent intent) {
         initService();
+
         if (intent != null) {
             final String action = intent.getAction();
+
             if (ACTION_SET_ALARM.equals(action)) {
                 Integer id = intent.getIntExtra(EXTRA_ALARM_ID, -1);
                 handleSetAlarm(id);
-                System.out.println("ID " + id);
             } else if (ACTION_UPDATE_ALARM.equals(action)) {
                 Integer id = intent.getIntExtra(EXTRA_ALARM_ID, -1);
-                System.out.println("ID " + id);
-                handleUpdateAlarm(id);
+                handleSetAlarm(id);
             } else if (ACTION_DELETE_ALARM.equals(action)) {
                 Integer id = intent.getIntExtra(EXTRA_ALARM_ID, -1);
                 handleDeleteAlarm(id);
             } else if (ACTION_SET_ALL_ALARMS_ON_BOOT.equals(action)) {
                 handleSetAllAlarmsOnBoot();
+            } else if (ACTION_LATER_ALARM.equals(action)) {
+                Integer id = intent.getIntExtra(EXTRA_ALARM_ID, -1);
+                handleLaterAlarm(id);
             }
         }
     }
@@ -123,7 +158,6 @@ public class TubeAlarmService extends IntentService {
             return;
         }
 
-        Calendar now = Calendar.getInstance();
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.DAY_OF_WEEK, day);
         calendar.set(Calendar.HOUR_OF_DAY, alarm.getHours());
@@ -131,14 +165,14 @@ public class TubeAlarmService extends IntentService {
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND, 0);
 
+        Calendar now = Calendar.getInstance();
         if (calendar.before(now)) {
             calendar.add(Calendar.WEEK_OF_YEAR, 1);
         }
 
         Intent intent = new Intent(serviceContext, AlarmBroadcastReceiver.class);
         intent.putExtra("id", alarm.getId());
-        intent.putExtra("youtubeUrl", alarm.getYoutubeUrl());
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(serviceContext,  alarm.getId()*10 + day, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(serviceContext, alarm.getId() * 10 + day, intent, PendingIntent.FLAG_ONE_SHOT);
 
         // TODO
         // !!! IMPORTANT !!!
@@ -146,6 +180,7 @@ public class TubeAlarmService extends IntentService {
 //        if (alarm.getRepeatWeekly()) {
 //            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY * 7, pendingIntent);
 //        } else {
+
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
@@ -170,8 +205,7 @@ public class TubeAlarmService extends IntentService {
     private void deleteAlarmForDay(int day, Alarm alarm) {
         Intent intent = new Intent(serviceContext, AlarmBroadcastReceiver.class);    //OneShotAlarm is the broadcast receiver you use for alarm
         intent.putExtra("id", alarm.getId());
-        intent.putExtra("youtubeUrl", alarm.getYoutubeUrl());
-        PendingIntent sender = PendingIntent.getBroadcast(serviceContext, alarm.getId()*10 + day, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+        PendingIntent sender = PendingIntent.getBroadcast(serviceContext, alarm.getId() * 10 + day, intent, PendingIntent.FLAG_ONE_SHOT);
         alarmManager.cancel(sender);
     }
 
@@ -183,6 +217,7 @@ public class TubeAlarmService extends IntentService {
         deleteAlarmForDay(Calendar.FRIDAY, alarm);
         deleteAlarmForDay(Calendar.SATURDAY, alarm);
         deleteAlarmForDay(Calendar.SUNDAY, alarm);
+        deleteAlarmForDay(8, alarm);
     }
 
     /* Set Alarm */
@@ -192,17 +227,19 @@ public class TubeAlarmService extends IntentService {
         setAlarmForAllDays(alarm);
     }
 
-    /* Update Alarm */
-    private void handleUpdateAlarm(Integer id) {
-        Alarm alarm = alarmDatabaseHelper.get(id);
-        deleteAlarmForAllDays(alarm);
-        setAlarmForAllDays(alarm);
-    }
+//    /* Update Alarm */
+//    private void handleUpdateAlarm(Integer id) {
+//        Alarm alarm = alarmDatabaseHelper.get(id);
+//        deleteAlarmForAllDays(alarm);
+//        setAlarmForAllDays(alarm);
+//    }
 
     /* Delete Alarm */
     private void handleDeleteAlarm(Integer id) {
         Alarm alarm = alarmDatabaseHelper.get(id);
         deleteAlarmForAllDays(alarm);
+        alarmDatabaseHelper.delete(alarm);
+        Toast.makeText(serviceContext, "Deleted from service", Toast.LENGTH_SHORT).show();
     }
 
     /* Boot */
@@ -210,6 +247,29 @@ public class TubeAlarmService extends IntentService {
         List<Alarm> list = alarmDatabaseHelper.getAll();
         for (Alarm alarm : list) {
             setAlarmForAllDays(alarm);
+        }
+    }
+
+    /* Handle Later Alarm */
+    private void handleLaterAlarm(Integer id) {
+        if (id == -1) {
+            return;
+        }
+        Alarm alarm = alarmDatabaseHelper.get(id);
+        Calendar later = Calendar.getInstance();
+        later.add(Calendar.MINUTE, 3);
+
+        Intent intent = new Intent(serviceContext, AlarmBroadcastReceiver.class);
+        intent.putExtra("id", alarm.getId());
+        intent.putExtra("later", true);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(serviceContext, alarm.getId() * 10 + 8, intent, PendingIntent.FLAG_ONE_SHOT);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, later.getTimeInMillis(), pendingIntent);
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, later.getTimeInMillis(), pendingIntent);
+        } else {
+            alarmManager.set(AlarmManager.RTC_WAKEUP, later.getTimeInMillis(), pendingIntent);
         }
     }
 }

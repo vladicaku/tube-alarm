@@ -166,6 +166,7 @@
                 android:id="@+id/alarm_fragment_youtube_url"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:text="ZSRkkGOVtjc"
                 android:hint="@string/youtube_url"
                 android:maxLines="1"/>
 

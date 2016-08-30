@@ -57,43 +57,43 @@ public class AlarmListAdapter extends ArrayAdapter<Alarm> {
             TextView saturday = ((TextView) view.findViewById(R.id.alarm_item_day_saturday));
             TextView sunday = ((TextView) view.findViewById(R.id.alarm_item_day_sunday));
 
-            if (alarm.getMonday() == true) {
+            if (alarm.getMonday()) {
                 monday.setTextColor(getContext().getResources().getColor(R.color.alarm_item_active_day));
             } else {
                 monday.setTextColor(getContext().getResources().getColor(android.R.color.primary_text_dark));
             }
 
-            if (alarm.getTuesday() == true) {
+            if (alarm.getTuesday()) {
                 tuesday.setTextColor(getContext().getResources().getColor(R.color.alarm_item_active_day));
             } else {
                 tuesday.setTextColor(getContext().getResources().getColor(android.R.color.primary_text_dark));
             }
 
-            if (alarm.getWednesday() == true) {
+            if (alarm.getWednesday()) {
                 wednesday.setTextColor(getContext().getResources().getColor(R.color.alarm_item_active_day));
             } else {
                 wednesday.setTextColor(getContext().getResources().getColor(android.R.color.primary_text_dark));
             }
 
-            if (alarm.getTuesday() == true) {
+            if (alarm.getThursday()) {
                 thursday.setTextColor(getContext().getResources().getColor(R.color.alarm_item_active_day));
             } else {
                 thursday.setTextColor(getContext().getResources().getColor(android.R.color.primary_text_dark));
             }
 
-            if (alarm.getFriday() == true) {
+            if (alarm.getFriday()) {
                 friday.setTextColor(getContext().getResources().getColor(R.color.alarm_item_active_day));
             } else {
                 friday.setTextColor(getContext().getResources().getColor(android.R.color.primary_text_dark));
             }
 
-            if (alarm.getSaturday() == true) {
+            if (alarm.getSaturday()) {
                 saturday.setTextColor(getContext().getResources().getColor(R.color.alarm_item_active_day));
             } else {
                 saturday.setTextColor(getContext().getResources().getColor(android.R.color.primary_text_dark));
             }
 
-            if (alarm.getSunday() == true) {
+            if (alarm.getSunday()) {
                 sunday.setTextColor(getContext().getResources().getColor(R.color.alarm_item_active_day));
             } else {
                 sunday.setTextColor(getContext().getResources().getColor(android.R.color.primary_text_dark));

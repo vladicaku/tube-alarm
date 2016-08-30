@@ -1,6 +1,9 @@
 package vlabs.tubealarm.fragment;
 
+import android.app.AlertDialog;
 import android.app.ListFragment;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -20,10 +23,10 @@ import vlabs.tubealarm.service.TubeAlarmService;
 
 public class AlarmListFragment extends ListFragment implements AdapterView.OnItemClickListener, AlarmListAdapter.AlarmListAdapterListener {
 
-    AlarmDatabaseHelper alarmDatabaseHelper = null;
-    List<Alarm> list = null;
-    AlarmListAdapter alarmListAdapter;
-    AlarmListFragmentListener alarmListFragmentListener;
+    private AlarmDatabaseHelper alarmDatabaseHelper = null;
+    private List<Alarm> list = null;
+    private AlarmListAdapter alarmListAdapter;
+    private AlarmListFragmentListener alarmListFragmentListener;
 
     public static interface AlarmListFragmentListener {
         void onAlarmClick(Alarm alarm);
@@ -37,6 +40,21 @@ public class AlarmListFragment extends ListFragment implements AdapterView.OnIte
         } catch (Exception ex) {
             throw new ClassCastException(getActivity().toString() + " must implement AlarmListFragmentListener");
         }
+
+//        final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+//        builder.setMessage("Are you sure?").setPositiveButton("Yes", new DialogInterface.OnClickListener(){
+//            @Override
+//            public void onClick(DialogInterface dialog, int which) {
+//                dialog.dismiss();
+//            }
+//        });
+//        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+//            @Override
+//            public void onClick(DialogInterface dialog, int which) {
+//                dialog.dismiss();
+//            }
+//        });
+//        final AlertDialog alert = builder.create();
         return view;
     }
 
@@ -50,7 +68,20 @@ public class AlarmListFragment extends ListFragment implements AdapterView.OnIte
 //        arrayAdapter = new ArrayAdapter<Alarm>(this, null, R.layout.alarm_item, )
 //        ArrayAdapter adapter = ArrayAdapter.createFromResource(getActivity(), R.array.Planets, android.R.layout.simple_list_item_1);
         setListAdapter(alarmListAdapter);
+
         getListView().setOnItemClickListener(this);
+
+        final Context context = getActivity();
+        getListView().setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                Alarm alarm = list.get(position);
+                TubeAlarmService.deleteAlarm(context, alarm.getId());
+                list.remove(position);
+                alarmListAdapter.notifyDataSetChanged();
+                return true;
+            }
+        });
     }
 
     @Override
@@ -63,6 +94,7 @@ public class AlarmListFragment extends ListFragment implements AdapterView.OnIte
         Alarm alarm = alarmListAdapter.getItem(position);
         alarmListFragmentListener.onAlarmClick(alarm);
     }
+
 
     public void reload() {
         List<Alarm> newList = alarmDatabaseHelper.getAll();
