@@ -21,8 +21,8 @@ import vlabs.tubealarm.repo.AlarmDatabaseHelper;
  * An {@link IntentService} subclass for handling asynchronous task requests in
  * a service on a separate handler thread.
  * <p/>
- *
- *  adb shell dumpsys alarm > t.txt
+ * <p/>
+ * adb shell dumpsys alarm > t.txt
  */
 public class TubeAlarmService extends IntentService {
     private static final String ACTION_SET_ALARM = "vlabs.tubealarm.service.action.SET_ALARM";
@@ -181,13 +181,15 @@ public class TubeAlarmService extends IntentService {
     }
 
     private void setAlarmForAllDays(Alarm alarm) {
-        setAlarmForDay(Calendar.MONDAY, alarm);
-        setAlarmForDay(Calendar.TUESDAY, alarm);
-        setAlarmForDay(Calendar.WEDNESDAY, alarm);
-        setAlarmForDay(Calendar.THURSDAY, alarm);
-        setAlarmForDay(Calendar.FRIDAY, alarm);
-        setAlarmForDay(Calendar.SATURDAY, alarm);
-        setAlarmForDay(Calendar.SUNDAY, alarm);
+        if (alarm.getEnabled()) {
+            setAlarmForDay(Calendar.MONDAY, alarm);
+            setAlarmForDay(Calendar.TUESDAY, alarm);
+            setAlarmForDay(Calendar.WEDNESDAY, alarm);
+            setAlarmForDay(Calendar.THURSDAY, alarm);
+            setAlarmForDay(Calendar.FRIDAY, alarm);
+            setAlarmForDay(Calendar.SATURDAY, alarm);
+            setAlarmForDay(Calendar.SUNDAY, alarm);
+        }
     }
 
     private void deleteAlarmForDay(int day, Alarm alarm) {
