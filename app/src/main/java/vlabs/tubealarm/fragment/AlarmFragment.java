@@ -3,7 +3,6 @@ package vlabs.tubealarm.fragment;
 import android.annotation.TargetApi;
 import android.app.Fragment;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -19,7 +18,7 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import vlabs.tubealarm.R;
-import vlabs.tubealarm.config.YoutubeConfig;
+import vlabs.tubealarm.config.YouTubeConfig;
 import vlabs.tubealarm.model.Alarm;
 import vlabs.tubealarm.repo.AlarmDatabaseHelper;
 import vlabs.tubealarm.service.TubeAlarmService;
@@ -92,7 +91,7 @@ public class AlarmFragment extends Fragment {
         message = (EditText) getView().findViewById(R.id.alarm_fragment_message);
 
         enabled.setChecked(true);
-        youtubeUrl.setText(YoutubeConfig.VIDEO_ID);
+        youtubeUrl.setText(YouTubeConfig.VIDEO_ID);
 
         loadAlarm();
 

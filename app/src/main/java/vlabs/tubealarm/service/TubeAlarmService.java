@@ -207,7 +207,7 @@ public class TubeAlarmService extends IntentService {
         deleteAlarmForDay(Calendar.FRIDAY, alarm);
         deleteAlarmForDay(Calendar.SATURDAY, alarm);
         deleteAlarmForDay(Calendar.SUNDAY, alarm);
-        deleteAlarmForDay(8, alarm);
+        deleteAlarmForDay(8, alarm); // later alarm if exists
     }
 
     /* Set Alarm */
@@ -241,7 +241,7 @@ public class TubeAlarmService extends IntentService {
         }
         Alarm alarm = alarmDatabaseHelper.get(id);
         Calendar later = Calendar.getInstance();
-        later.add(Calendar.MINUTE, 3);
+        later.add(Calendar.MINUTE, 1);
 
         Intent intent = new Intent(serviceContext, AlarmBroadcastReceiver.class);
         intent.putExtra("id", alarm.getId());

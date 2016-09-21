@@ -35,6 +35,7 @@ public class MainActivity extends Activity implements AlarmListFragment.AlarmLis
         /* Exit App */
         if (getIntent().getBooleanExtra("EXIT", false)) {
             finish();
+            System.exit(0);
         }
 
 //        myouTubePlayerView = (YouTubePlayerView) findViewById(R.id.youtube_player_view);

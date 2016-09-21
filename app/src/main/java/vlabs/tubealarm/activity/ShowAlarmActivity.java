@@ -5,23 +5,28 @@ import android.content.Intent;
 import android.media.MediaPlayer;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.os.Vibrator;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.youtube.player.YouTubeBaseActivity;
+import com.google.android.youtube.player.YouTubeInitializationResult;
+import com.google.android.youtube.player.YouTubePlayer;
+import com.google.android.youtube.player.YouTubePlayerView;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 import vlabs.tubealarm.R;
+import vlabs.tubealarm.config.YouTubeConfig;
 import vlabs.tubealarm.model.Alarm;
 import vlabs.tubealarm.repo.AlarmDatabaseHelper;
 import vlabs.tubealarm.service.TubeAlarmService;
 
-public class ShowAlarmActivity extends Activity {
+public class ShowAlarmActivity extends YouTubeBaseActivity {
 
     private MediaPlayer mediaPlayer;
     private Vibrator vibrator;
@@ -33,6 +38,9 @@ public class ShowAlarmActivity extends Activity {
     private Button ok;
     private Button later;
     private Activity activity;
+
+    private YouTubePlayerView youTubePlayerView;
+    private YouTubePlayer.OnInitializedListener onInitializedListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,22 +101,56 @@ public class ShowAlarmActivity extends Activity {
             }
         });
 
+        youTubePlayerView = (YouTubePlayerView) findViewById(R.id.show_alarm_activity_youtube_player);
+        onInitializedListener = new YouTubePlayer.OnInitializedListener() {
+            @Override
+            public void onInitializationSuccess(YouTubePlayer.Provider provider, YouTubePlayer youTubePlayer, boolean wasRestored) {
+//                if (wasRestored) {
+//                    youTubePlayer.loadVideo(alarm.getYoutubeUrl());
+//                    youTubePlayer.play();
+//                }
+//                else {
+//                    youTubePlayer.loadVideo(alarm.getYoutubeUrl());
+////                    youTubePlayer.cueVideo(alarm.getYoutubeUrl()); // Plays https://www.youtube.com/watch?v=fhWaJi1Hsfo
+////                    youTubePlayer.loadVideo(alarm.getYoutubeUrl());
+//                    youTubePlayer.play();
+////
+//                }
 
+//                    youTubePlayer.setPlayerStyle(YouTubePlayer.PlayerStyle.CHROMELESS);
+                    youTubePlayer.loadVideo(alarm.getYoutubeUrl());
+
+            }
+
+            @Override
+            public void onInitializationFailure(YouTubePlayer.Provider provider, YouTubeInitializationResult youTubeInitializationResult) {
+
+            }
+        };
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         if (alarm.getVibrate()) {
-            long[] pattern = {0, 200, 0};
+            // Start without a delay
+            // Vibrate for 100 milliseconds
+            // Sleep for 1000 milliseconds
+            long[] pattern = {0, 400, 6000};
             vibrator.vibrate(pattern, 0);
         }
-        mediaPlayer.start();
+        if (checkConnection()) {
+            youTubePlayerView.initialize(YouTubeConfig.API_KEY, onInitializedListener);
+            Toast.makeText(this, "DA BE", Toast.LENGTH_SHORT).show();
+        } else {
+            mediaPlayer.start();
+        }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        vibrator.cancel();
         mediaPlayer.stop();
     }
 
